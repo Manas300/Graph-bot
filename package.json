@@ -1,0 +1,20 @@
+{
+  "name": "grad-assist-graph-generator",
+  "version": "1.0.0",
+  "description": "A professional web application for generating graphs from data files using AI-powered query interpretation",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && nodemon index.js",
+    "client": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "start": "cd server && node index.js",
+    "setup": "echo 'Please run: npm install && cd client && npm install && cd ../server && npm install && cd ../python-service && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt'"
+  },
+  "keywords": ["react", "nodejs", "python", "graphs", "data-visualization", "ollama", "ai"],
+  "author": "Graduate Student",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

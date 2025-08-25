@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  # Frontend React App
+  frontend:
+    image: graph-bot-frontend:latest
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+    depends_on:
+      - backend
+    networks:
+      - graph-network
+    restart: unless-stopped
+
+  # Backend Node.js API
+  backend:
+    image: graph-bot-backend:latest
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - PYTHON_SERVICE_URL=http://python-service:8000
+      - OLLAMA_HOST=ollama:11434
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      - ollama
+      - python-service
+    networks:
+      - graph-network
+    restart: unless-stopped
+
+  # Python Service
+  python-service:
+    image: graph-bot-python:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+      - OLLAMA_HOST=ollama:11434
+    volumes:
+      - uploads:/app/uploads
+      - graph-output:/app/output
+    depends_on:
+      - ollama
+    networks:
+      - graph-network
+    restart: unless-stopped
+
+  # Ollama LLM Service
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    networks:
+      - graph-network
+    restart: unless-stopped
+    # Pull llama2 model on startup
+    command: >
+      sh -c "ollama serve & 
+             sleep 10 && 
+             ollama pull llama2 && 
+             wait"
+
+volumes:
+  uploads:
+    driver: local
+  graph-output:
+    driver: local
+  ollama-data:
+    driver: local
+
+networks:
+  graph-network:
+    driver: bridge

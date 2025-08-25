@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: graph-bot
+  labels:
+    app: graph-bot
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: graph-bot-config
+  namespace: graph-bot
+data:
+  PYTHON_SERVICE_URL: "http://python-service:8000"
+  OLLAMA_HOST: "ollama:11434"
+  NODE_ENV: "production"

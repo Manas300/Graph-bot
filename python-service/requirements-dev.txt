@@ -1,0 +1,24 @@
+# AI-Powered Graph Generator - Development Dependencies
+# Install with: pip install -r requirements-dev.txt
+
+# Include production requirements
+-r requirements.txt
+
+# Development and Testing Tools
+pytest>=7.4.0,<7.5.0          # Testing framework
+pytest-cov>=4.1.0,<4.2.0      # Coverage reporting
+black>=23.7.0,<23.8.0          # Code formatter
+flake8>=6.0.0,<6.1.0           # Linting tool
+mypy>=1.5.0,<1.6.0             # Type checking
+
+# Jupyter for development and exploration
+jupyter>=1.0.0,<1.1.0          # Jupyter notebook
+ipykernel>=6.24.0,<6.25.0     # Jupyter kernel
+
+# Performance profiling
+memory_profiler>=0.60.0,<0.61.0   # Memory usage profiling
+line_profiler>=4.1.0,<4.2.0       # Line-by-line profiling
+
+# Documentation
+sphinx>=7.1.0,<7.2.0              # Documentation generator
+sphinx-rtd-theme>=1.3.0,<1.4.0    # Read the Docs theme

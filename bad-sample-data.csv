@@ -1,0 +1,7 @@
+Month,Sales,Marketing_Spend,Customer_Count,Region
+January,50000,not_a_number,150,North
+February,60000,8000,hello_world,South
+March,55000,7500,140,East
+April,text_value,9000,160,West
+May,70000,8500,180,North
+June,65000,invalid_data,170,South

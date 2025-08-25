@@ -1,0 +1,31 @@
+# AI-Powered Graph Generator - Python Dependencies
+# Compatible with Python 3.10 - 3.13
+
+# Core Data Processing Libraries
+numpy>=1.24.0,<2.4.0          # Numerical computing library
+pandas>=2.0.0,<2.4.0          # Data manipulation and analysis
+openpyxl>=3.1.0,<3.3.0        # Excel file support (.xlsx, .xls)
+scipy>=1.10.0,<1.17.0         # Scientific computing library
+
+# Graph Generation Libraries
+matplotlib>=3.7.0,<3.11.0     # Static plotting library
+plotly>=5.15.0,<6.4.0         # Interactive plotting library
+seaborn>=0.12.0,<0.14.0       # Statistical data visualization
+kaleido>=0.2.1,<1.1.0         # Static image export for Plotly
+
+# Machine Learning (for advanced analytics)
+scikit-learn>=1.3.0,<1.8.0    # Machine learning library
+
+# HTTP and API Communication
+requests>=2.31.0,<2.33.0      # HTTP library for Ollama communication
+
+# Environment and Configuration
+python-dotenv>=1.0.0,<1.2.0   # Environment variable management
+
+# HTTP Server for Microservice Communication
+flask>=2.3.0,<3.1.0           # Web framework for HTTP API
+
+# Additional Graph Types and Enhancements (Optional)
+# wordcloud>=1.9.0,<1.10.0    # Word cloud generation
+# bokeh>=3.2.0,<3.3.0         # Interactive web plotting
+# altair>=5.0.0,<5.1.0        # Grammar of graphics library

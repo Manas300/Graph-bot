@@ -1,0 +1,40 @@
+# Multi-node kind cluster configuration
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: graph-bot
+nodes:
+# Control plane node (tainted - no application workloads)
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "node-type=control-plane"
+
+# Worker node 1 - Frontend and Backend services
+- role: worker
+  kubeadmConfigPatches:
+  - |
+    kind: JoinConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "node-type=frontend-backend,workload-type=web"
+
+# Worker node 2 - AI/ML services (Python + Ollama)
+- role: worker
+  kubeadmConfigPatches:
+  - |
+    kind: JoinConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "node-type=ai-ml,workload-type=compute"
+
+# Networking configuration
+networking:
+  # Disable default CNI to use kindnet
+  disableDefaultCNI: false
+  # Pod subnet
+  podSubnet: "10.244.0.0/16"
+  # Service subnet  
+  serviceSubnet: "10.96.0.0/12"

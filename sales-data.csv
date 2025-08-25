@@ -1,0 +1,13 @@
+Month,Sales,Revenue,Customers,Region
+January,1200,45000,320,North
+February,1350,52000,380,North
+March,1180,43500,295,North
+April,1420,58000,410,South
+May,1680,67000,485,South
+June,1590,61500,445,South
+July,1750,72000,520,East
+August,1820,75500,550,East
+September,1690,68000,490,East
+October,1580,63000,445,West
+November,1720,69500,505,West
+December,1950,82000,580,West

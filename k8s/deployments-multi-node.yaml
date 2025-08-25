@@ -1,0 +1,235 @@
+---
+# Frontend Deployment - Web Services Node
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: graph-bot
+  labels:
+    app: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+        tier: web
+    spec:
+      # Schedule on web services node
+      nodeSelector:
+        workload-type: web
+      containers:
+      - name: frontend
+        image: graph-bot-frontend:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 3
+---
+# Backend Deployment - Web Services Node
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: graph-bot
+  labels:
+    app: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+        tier: api
+    spec:
+      # Schedule on web services node
+      nodeSelector:
+        workload-type: web
+      containers:
+      - name: backend
+        image: graph-bot-backend:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5000
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: graph-bot-config
+              key: NODE_ENV
+        - name: PYTHON_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: graph-bot-config
+              key: PYTHON_SERVICE_URL
+        - name: OLLAMA_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: graph-bot-config
+              key: OLLAMA_HOST
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+# Python Service Deployment - AI/ML Node
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-service
+  namespace: graph-bot
+  labels:
+    app: python-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-service
+  template:
+    metadata:
+      labels:
+        app: python-service
+        tier: ai-ml
+    spec:
+      # Schedule on AI/ML compute node
+      nodeSelector:
+        workload-type: compute
+      containers:
+      - name: python-service
+        image: graph-bot-python:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+        env:
+        - name: PYTHONPATH
+          value: "/app"
+        - name: OLLAMA_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: graph-bot-config
+              key: OLLAMA_HOST
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+# Ollama Deployment - AI/ML Node (Anti-affinity with Python service for resource distribution)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  namespace: graph-bot
+  labels:
+    app: ollama
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+        tier: ai-ml
+    spec:
+      # Schedule on AI/ML compute node
+      nodeSelector:
+        workload-type: compute
+      # Prefer different node than python-service if possible
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - python-service
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: ollama
+        image: ollama/ollama:latest
+        ports:
+        - containerPort: 11434
+        env:
+        - name: OLLAMA_HOST
+          value: "0.0.0.0:11434"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: ollama-data
+          mountPath: /root/.ollama
+        livenessProbe:
+          exec:
+            command: ["ollama", "list"]
+          initialDelaySeconds: 120
+          periodSeconds: 30
+        readinessProbe:
+          exec:
+            command: ["ollama", "list"]
+          initialDelaySeconds: 60
+          periodSeconds: 15
+      volumes:
+      - name: ollama-data
+        emptyDir: {}

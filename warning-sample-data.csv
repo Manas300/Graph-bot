@@ -1,0 +1,11 @@
+Month,Sales,Marketing_Spend,Customer_Count,Region
+January,50000,5000,150,North
+February,60000,,140,South
+March,55000,7500,,East
+April,65000,9000,160,West
+May,70000,,180,South
+June,65000,8500,170,North
+July,72000,,145,South
+August,75000,9500,,North
+September,68000,,165,East
+October,72000,8000,155,West
