@@ -1,316 +1,206 @@
-# AI-Powered Graph Generator
+# Graph-bot
 
-A professional-grade web application that generates intelligent data visualizations from CSV and Excel files using natural language queries. Built with React, Node.js, Python, and powered by Ollama LLM.
+A web application for generating data visualizations from CSV and Excel files using natural language queries. Built with React, Node.js, Python, and integrated with Ollama for intelligent chart type selection.
 
-## 🎯 Features
+## Features
 
 ### Core Functionality
-- **Smart File Upload**: Accepts only CSV and Excel files (.csv, .xls, .xlsx) with strict validation
-- **Natural Language Processing**: Describe your visualization needs in plain English
-- **AI-Powered Analysis**: Uses Ollama LLM to interpret queries and select optimal chart types
-- **Multiple Chart Types**: Supports bar charts, line charts, scatter plots, pie charts, histograms, box plots, and heatmaps
-- **Sandboxed Python Execution**: Graph generation happens in isolated Python environment
-- **Professional UI**: Modern, responsive interface built with Material-UI
+- File upload support for CSV and Excel formats (.csv, .xls, .xlsx)
+- Natural language query processing for visualization requests
+- Automated chart type selection based on data analysis
+- Multiple visualization types: bar charts, line charts, scatter plots, pie charts, histograms, box plots, and heatmaps
+- Responsive web interface with modern design
 
-### Security & Performance
-- File size limits (10MB maximum)
-- Rate limiting and security headers
-- Input validation and sanitization
-- Error handling and graceful fallbacks
-- Session-based processing
+### Technical Capabilities
+- File size validation (10MB maximum)
+- Input sanitization and error handling
+- Session-based request processing
+- Fallback mechanisms for reliable operation
 
-## 🏗️ Architecture
+## Architecture
+
+The application consists of three main components:
 
 ```
-grad_assist/
+Graph-bot/
 ├── client/                 # React TypeScript frontend
-│   ├── src/
-│   │   ├── components/     # UI components
-│   │   ├── types.ts        # TypeScript definitions
-│   │   └── App.tsx         # Main application
-│   └── package.json
-├── server/                 # Node.js backend
-│   ├── index.js           # Express server
-│   └── package.json
-├── python-service/         # Python graph generation
-│   ├── graph_generator.py  # Main graph generation logic
-│   └── requirements.txt
-└── package.json           # Root package manager
+├── server/                 # Node.js Express backend
+├── python-service/         # Python graph generation service
+└── k8s/                   # Kubernetes deployment configurations
 ```
 
-## 📋 Prerequisites
+## Prerequisites
 
-### Required Software
-1. **Node.js** (v16 or higher) - JavaScript runtime
-2. **Python** (v3.10 - v3.13) - For graph generation
-3. **Ollama** (for LLM functionality) - AI model server
-4. **Homebrew** (macOS) - Package manager
+- Node.js (v16 or higher)
+- Python (v3.10 - v3.13)
+- Docker (for containerized deployment)
+- Kubernetes cluster (for production deployment)
+- Ollama (optional, for enhanced NLP capabilities)
 
-### Step-by-Step Installation
+## Installation
 
-#### 1. Install Homebrew (macOS only)
+### Local Development
+
+1. Clone the repository:
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+git clone https://github.com/Manas300/Graph-bot.git
+cd Graph-bot
 ```
 
-#### 2. Install Node.js
+2. Install dependencies:
 ```bash
-# macOS with Homebrew
-brew install node
-
-# Verify installation
-node --version  # Should show v18+ or higher
-npm --version   # Should show v8+ or higher
-```
-
-#### 3. Install Python
-```bash
-# macOS with Homebrew (if not already installed)
-brew install python@3.13
-
-# Verify installation
-python3 --version  # Should show Python 3.10+ or higher
-pip3 --version     # Should show pip version
-```
-
-#### 4. Install Ollama
-```bash
-# macOS
-brew install ollama
-
-# Linux
-curl -fsSL https://ollama.ai/install.sh | sh
-
-# Windows - Download from https://ollama.ai/download
-```
-
-#### 5. Start Ollama and Install Model
-```bash
-# Start Ollama service
-brew services start ollama
-# OR run manually: ollama serve
-
-# In another terminal, pull the LLM model (this may take a few minutes)
-ollama pull llama2
-
-# Verify model is available
-ollama list
-```
-
-## 🚀 Installation & Setup
-
-### 1. Clone and Install Dependencies
-```bash
-# Navigate to project directory
-cd grad_assist
-
-# Install all dependencies (root, client, server)
+# Install Node.js dependencies
 npm install
-cd client && npm install
-cd ../server && npm install
-cd ../python-service
-
-# Create Python virtual environment
-python3 -m venv venv
-source venv/bin/activate
+cd client && npm install && cd ..
+cd server && npm install && cd ..
 
 # Install Python dependencies
+cd python-service
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
+cd ..
 ```
 
-### 2. Environment Configuration
-Create environment files:
+3. Start the services:
+```bash
+# Start all services with Docker Compose
+docker-compose up --build
 
-**Server Configuration** (`server/.env`):
-```env
+# Or start individually:
+# Backend: npm run server
+# Frontend: npm run client
+# Python service: cd python-service && python http_server.py
+```
+
+### Kubernetes Deployment
+
+For production deployment on Kubernetes:
+
+1. Build Docker images:
+```bash
+docker build -t graph-bot-frontend:latest ./client
+docker build -t graph-bot-backend:latest ./server
+docker build -t graph-bot-python:latest ./python-service
+```
+
+2. Deploy to Kubernetes:
+```bash
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/deployments-multi-node.yaml
+kubectl apply -f k8s/services.yaml
+```
+
+3. Access the application:
+```bash
+kubectl port-forward svc/frontend-lb 3000:80 -n graph-bot
+```
+
+### Kind (Local Kubernetes)
+
+For local Kubernetes testing with Kind:
+
+1. Create cluster:
+```bash
+kind create cluster --config kind-multi-node.yaml --name graph-bot
+```
+
+2. Run deployment script:
+```bash
+chmod +x k8s-start-multi-node.sh
+./k8s-start-multi-node.sh
+```
+
+## Usage
+
+1. **Upload Data File**: Select a CSV or Excel file containing your data
+2. **Enter Query**: Describe the visualization you want in natural language
+   - Example: "Show me a bar chart of Sales by Month"
+   - Example: "Create a line chart showing trends over time"
+3. **Generate Graph**: The system analyzes your data and creates the appropriate visualization
+4. **Download Result**: Save the generated chart as a high-quality image
+
+## API Endpoints
+
+- `GET /api/health` - Service health check
+- `POST /api/generate-graph` - Generate visualization from uploaded data and query
+
+## Supported Chart Types
+
+| Type | Description | Data Requirements |
+|------|-------------|-------------------|
+| Bar Chart | Compare categorical data | Categorical and numeric columns |
+| Line Chart | Show trends over time | Time series or sequential data |
+| Scatter Plot | Display correlations | Two numeric columns |
+| Pie Chart | Show proportions | Categorical data with counts |
+| Histogram | Show frequency distribution | Single numeric column |
+| Box Plot | Display statistical distribution | Numeric data |
+| Heatmap | Show correlation matrix | Multiple numeric columns |
+
+## Configuration
+
+### Environment Variables
+
+**Server (.env)**:
+```
 PORT=5000
 CLIENT_URL=http://localhost:3000
 NODE_ENV=development
-OLLAMA_BASE_URL=http://localhost:11434
+PYTHON_SERVICE_URL=http://localhost:8000
+OLLAMA_HOST=localhost:11434
 ```
 
-### 3. Start Ollama Service
-```bash
-# Start Ollama service (if not already running)
-brew services start ollama
+**Kubernetes ConfigMap**:
+The application uses Kubernetes ConfigMaps for environment configuration in production deployments.
 
-# OR run manually in a separate terminal
-ollama serve
-```
-
-### 4. Run the Application
-
-#### Option A: Use the Startup Script (Recommended)
-```bash
-# Make the script executable (first time only)
-chmod +x start.sh
-
-# Run the application
-./start.sh
-```
-
-#### Option B: Manual Startup
-```bash
-# Terminal 1 - Start Python virtual environment
-cd python-service
-source venv/bin/activate
-
-# Terminal 2 - Development mode (starts both frontend and backend)
-npm run dev
-
-# Or run separately:
-# Terminal 2 - Backend
-npm run server
-
-# Terminal 3 - Frontend  
-npm run client
-```
-
-### 5. Access the Application
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:5000
-- **Ollama**: http://localhost:11434
-
-## 🎮 Usage Guide
-
-### Step 1: Upload Data File
-- Click the upload area or drag & drop your file
-- Supported formats: CSV, Excel (.xls, .xlsx)
-- Maximum file size: 10MB
-- File validation ensures only data files are accepted
-
-### Step 2: Describe Your Visualization
-Enter a natural language query describing what you want to visualize:
-
-**Example Queries:**
-- "Show me a bar chart comparing sales by category"
-- "Create a line chart showing trends over time"
-- "Display a pie chart of the distribution"
-- "Generate a scatter plot to show correlation between price and quantity"
-- "Make a histogram of customer ages"
-
-### Step 3: View Generated Graph
-- AI analyzes your data and query
-- Generates appropriate visualization
-- Download high-quality PNG image
-- View data summary and insights
-
-## 🔧 Technical Details
-
-### Backend API Endpoints
-- `GET /api/health` - Health check
-- `POST /api/generate-graph` - Graph generation endpoint
-
-### File Processing
-- Automatic encoding detection for CSV files
-- Excel sheet parsing with pandas
-- Data type inference and column analysis
-- Error handling for corrupted files
-
-### AI Integration
-- Ollama LLM for query interpretation
-- Fallback logic when AI is unavailable
-- Context-aware chart type selection
-- Natural language understanding
-
-### Graph Generation
-- Matplotlib for high-quality static plots
-- Seaborn for statistical visualizations
-- Plotly for interactive charts
-- Custom styling and theming
-
-## 🛡️ Security Features
-
-- **File Validation**: Strict MIME type and extension checking
-- **Size Limits**: 10MB file size restriction
-- **Rate Limiting**: 100 requests per 15 minutes per IP
-- **Security Headers**: Helmet.js protection
-- **Input Sanitization**: Query and file content validation
-- **Sandboxed Execution**: Python subprocess isolation
-
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
-**1. Ollama Connection Error**
-```bash
-# Check if Ollama is running
-ollama list
+**File Upload Problems**:
+- Verify file format is CSV or Excel
+- Check file size is under 10MB
+- Ensure file contains valid data
 
-# Restart Ollama service
-ollama serve
-```
+**Graph Generation Errors**:
+- Confirm data has appropriate columns for requested chart type
+- Try simpler queries if complex requests fail
+- Check that numeric data exists for quantitative visualizations
 
-**2. Python Dependencies**
-```bash
-cd python-service
-pip install -r requirements.txt
-```
+**Service Connection Issues**:
+- Verify all services are running
+- Check network connectivity between components
+- Review service logs for specific error messages
 
-**3. File Upload Issues**
-- Ensure file is CSV or Excel format
-- Check file size (max 10MB)
-- Verify file is not corrupted
+### Logging
 
-**4. Graph Generation Fails**
-- Check data has numeric columns for most chart types
-- Ensure query is descriptive enough
-- Try simpler chart types (bar chart, line chart)
+- Frontend errors: Browser developer console
+- Backend logs: Server terminal output
+- Python service logs: Check container/service logs
+- Kubernetes logs: `kubectl logs <pod-name> -n graph-bot`
 
-### Error Logs
-- Backend logs: Check terminal running `npm run server`
-- Python logs: Check stderr output in server logs
-- Frontend errors: Check browser developer console
+## Development
 
-## 📊 Supported Chart Types
+### Project Structure
 
-| Chart Type | Best For | Requirements |
-|------------|----------|--------------|
-| Bar Chart | Comparing categories | Categorical + Numeric columns |
-| Line Chart | Trends over time | Numeric columns or time series |
-| Scatter Plot | Correlations | Two numeric columns |
-| Pie Chart | Proportions/Distribution | Categorical data |
-| Histogram | Frequency distribution | Single numeric column |
-| Box Plot | Statistical distribution | Numeric columns |
-| Heatmap | Correlation matrix | Multiple numeric columns |
+- `client/`: React TypeScript frontend with Material-UI components
+- `server/`: Express.js backend with file upload and API routing
+- `python-service/`: Flask service for data processing and visualization generation
+- `k8s/`: Kubernetes manifests for production deployment
 
-## 🎯 Performance Optimizations
+### Key Technologies
 
-- **Frontend**: React optimization, lazy loading, memoization
-- **Backend**: Express compression, efficient file handling
-- **Python**: Matplotlib non-interactive backend, optimized pandas operations
-- **Memory**: Automatic file cleanup, limited concurrent requests
+- **Frontend**: React, TypeScript, Material-UI, Axios
+- **Backend**: Node.js, Express, Multer, CORS
+- **Python Service**: Flask, Pandas, Matplotlib, Plotly, Seaborn
+- **Infrastructure**: Docker, Kubernetes, Kind
+- **AI Integration**: Ollama (optional)
 
-## 📈 Future Enhancements
+## Contributing
 
-- [ ] Interactive Plotly charts
-- [ ] Multiple file support
-- [ ] Real-time collaboration
-- [ ] Advanced statistical analysis
-- [ ] Export to multiple formats
-- [ ] Database integration
-- [ ] User authentication
-- [ ] Chart customization options
-
-## 🤝 Contributing
-
-This is an academic project. For improvements:
 1. Fork the repository
-2. Create feature branch
-3. Submit pull request with detailed description
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request with a clear description
 
-## 📝 License
-
-MIT License - Built for academic purposes.
-
-## 👥 Support
-
-For issues or questions:
-- Check troubleshooting section
-- Review error logs
-- Ensure all dependencies are installed
-- Verify Ollama is running and accessible
-
----
-
-**Built with ❤️ for data visualization and AI-powered insights**
