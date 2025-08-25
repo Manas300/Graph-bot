@@ -27,6 +27,9 @@ spec:
         imagePullPolicy: Never
         ports:
         - containerPort: 80
+        env:
+        - name: REACT_APP_API_URL
+          value: "http://backend:5000"
         resources:
           requests:
             memory: "64Mi"
@@ -189,6 +192,20 @@ spec:
       # Schedule on AI/ML compute node
       nodeSelector:
         workload-type: compute
+      # Download llama2 model before starting main container
+      initContainers:
+      - name: model-downloader
+        image: ollama/ollama:latest
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          ollama serve &
+          sleep 10
+          ollama pull llama2
+          pkill ollama
+        volumeMounts:
+        - name: ollama-data
+          mountPath: /root/.ollama
       # Prefer different node than python-service if possible
       affinity:
         podAntiAffinity:
