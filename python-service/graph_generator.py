@@ -64,7 +64,7 @@ class GraphGenerator:
                     "prompt": prompt,
                     "stream": False
                 },
-                timeout=30
+                timeout=60
             )
             
             if response.status_code == 200:
@@ -591,7 +591,14 @@ def main():
     session_id = sys.argv[3]
     
     try:
-        generator = GraphGenerator()
+        # Get Ollama URL from environment variable
+        ollama_host = os.getenv('OLLAMA_HOST', 'localhost:11434')
+        if not ollama_host.startswith('http'):
+            ollama_url = f"http://{ollama_host}"
+        else:
+            ollama_url = ollama_host
+        
+        generator = GraphGenerator(ollama_url=ollama_url)
         
         # Load data
         df = generator.load_data(file_path)
