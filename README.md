@@ -203,7 +203,7 @@ The application uses Kubernetes ConfigMaps for environment configuration in prod
 - **Backend**: Node.js, Express, Multer, CORS
 - **Python Service**: Flask, Pandas, Matplotlib, Plotly, Seaborn
 - **Infrastructure**: Docker, Kubernetes, Kind
-- **AI Integration**: Ollama (optional)
+- **AI Integration**: Ollama 
 
 ## Contributing
 
