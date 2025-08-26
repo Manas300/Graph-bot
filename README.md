@@ -5,6 +5,10 @@ A web application for generating data visualizations from CSV and Excel files us
 ## Video Demo
 [![image](https://github.com/user-attachments/assets/dc959cb4-4a1a-4f4a-9c64-5b237fd10ed0)](https://youtu.be/_KsvfwZz29Y)
 
+## Architecture Diagram
+[![image](https://github.com/user-attachments/assets/342d794d-0b45-4dce-98e7-a268f7f1af10)]
+
+
 
 
 ## Features
