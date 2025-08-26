@@ -3,7 +3,7 @@
 A web application for generating data visualizations from CSV and Excel files using natural language queries. Built with React, Node.js, Python, and integrated with Ollama for intelligent chart type selection.
 
 ## Video Demo
-[![image](https://github.com/user-attachments/assets/3465b14a-942a-471b-8226-a93d7ab0e4da)]([https://www.youtube.com/watch?v=QqNw1UXzww0)
+[![image](https://github.com/user-attachments/assets/dc959cb4-4a1a-4f4a-9c64-5b237fd10ed0)]([https://www.youtube.com/watch?v=QqNw1UXzww0)
 
 ## Features
 
